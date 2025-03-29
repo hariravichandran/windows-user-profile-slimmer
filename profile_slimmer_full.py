@@ -49,15 +49,27 @@ class FolderScanner(QThread):
         username = self.user_profile_path.name
         relocate_base = Path(f"C:/User_{username}")
 
-        all_items = [item for item in self.user_profile_path.iterdir()
-                     if item.is_dir() and item.name not in EXCLUDED_FOLDERS and not item.is_symlink()]
+        scan_targets = []
+        for item in self.user_profile_path.iterdir():
+            if item.name == "Documents" and item.is_dir():
+                # Add subfolders of Documents
+                for sub in item.iterdir():
+                    if sub.is_dir():
+                        scan_targets.append(sub)
+            elif item.is_dir() and item.name not in EXCLUDED_FOLDERS and not item.is_symlink():
+                scan_targets.append(item)
 
-        total = len(all_items)
+        total = len(scan_targets)
 
-        for idx, folder in enumerate(all_items):
+        for idx, folder in enumerate(scan_targets):
             try:
                 size = self.get_folder_size(folder)
-                target_path = relocate_base / folder.name
+                # Destination path: place Documents subfolders under C:/User_<username>/Documents/<sub>
+                if "Documents" in folder.parts:
+                    rel_path = Path("Documents") / folder.name
+                else:
+                    rel_path = Path(folder.name)
+                target_path = relocate_base / rel_path
                 entries.append(FolderEntry(folder, size, target_path))
             except Exception as e:
                 print(f"Failed to scan {folder}: {e}")
