@@ -12,8 +12,9 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtGui import QFont
 
-EXCLUDED_FOLDERS = {'AppData', 'MicrosoftEdgeBackups', 'OneDrive', 'Favorites', 'Saved Games', 'Searches'}
+EXCLUDED_FOLDERS = {'AppData', 'MicrosoftEdgeBackups', 'OneDrive', 'Favorites', 'Saved Games', 'Searches', '.idea', '.git', '.vscode'}
 SIZE_THRESHOLD_MB = 500
+LARGE_FILE_THRESHOLD = 500 * 1024 * 1024  # 500 MB
 
 def is_admin():
     try:
@@ -50,21 +51,35 @@ class FolderScanner(QThread):
         relocate_base = Path(f"C:/User_{username}")
 
         scan_targets = []
+        # Scan folders and subfolders in Documents
         for item in self.user_profile_path.iterdir():
             if item.name == "Documents" and item.is_dir():
-                # Add subfolders of Documents
                 for sub in item.iterdir():
                     if sub.is_dir():
                         scan_targets.append(sub)
             elif item.is_dir() and item.name not in EXCLUDED_FOLDERS and not item.is_symlink():
                 scan_targets.append(item)
 
-        total = len(scan_targets)
+        # Also scan large single files in user profile
+        for root, dirs, files in os.walk(self.user_profile_path):
+            if any(excluded in Path(root).parts for excluded in EXCLUDED_FOLDERS):
+                continue
+            for f in files:
+                try:
+                    file_path = Path(root) / f
+                    if file_path.is_symlink():
+                        continue
+                    size = file_path.stat().st_size
+                    if size >= LARGE_FILE_THRESHOLD:
+                        target = relocate_base / "LargeFiles" / file_path.name
+                        entries.append(FolderEntry(file_path, size, target))
+                except:
+                    continue
 
-        for idx, folder in enumerate(scan_targets):
+        # Now scan folders for size
+        for folder in scan_targets:
             try:
                 size = self.get_folder_size(folder)
-                # Destination path: place Documents subfolders under C:/User_<username>/Documents/<sub>
                 if "Documents" in folder.parts:
                     rel_path = Path("Documents") / folder.name
                 else:
@@ -73,7 +88,7 @@ class FolderScanner(QThread):
                 entries.append(FolderEntry(folder, size, target_path))
             except Exception as e:
                 print(f"Failed to scan {folder}: {e}")
-            self.progress.emit(int((idx + 1) / total * 100))
+            self.progress.emit(int((len(entries) / 100)))
 
         entries.sort(key=lambda x: x.size_bytes, reverse=True)
         self.finished.emit(entries)
@@ -117,7 +132,7 @@ class ProfileSlimmer(QWidget):
         layout.addWidget(self.status_label)
 
         self.table = QTableWidget(0, 5)
-        self.table.setHorizontalHeaderLabels(["Move?", "Folder", "Size", "Will Save", "Target Directory"])
+        self.table.setHorizontalHeaderLabels(["Move?", "Folder or File", "Size", "Will Save", "Target Directory"])
         layout.addWidget(self.table)
 
         btn_layout = QHBoxLayout()
@@ -198,15 +213,18 @@ class ProfileSlimmer(QWidget):
         selected_rows = [row for row in range(self.table.rowCount()) if self.table.cellWidget(row, 0).isChecked()]
 
         for idx, row in enumerate(selected_rows):
-            folder_path = Path(self.table.item(row, 1).text())
+            source_path = Path(self.table.item(row, 1).text())
             target_path = Path(self.table.item(row, 4).text())
             try:
-                size = sum(self.safe_get_size(f) for f in folder_path.rglob('*') if f.is_file())
+                if source_path.is_file():
+                    size = self.safe_get_size(source_path)
+                else:
+                    size = sum(self.safe_get_size(f) for f in source_path.rglob('*') if f.is_file())
             except:
                 size = 0
 
             if target_path.exists():
-                reply = QMessageBox.question(self, "Folder Exists", f"{target_path} already exists. Overwrite and merge?",
+                reply = QMessageBox.question(self, "Item Exists", f"{target_path} already exists. Overwrite and merge?",
                                              QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
                 if reply == QMessageBox.No:
                     continue
@@ -214,21 +232,21 @@ class ProfileSlimmer(QWidget):
             target_path.parent.mkdir(parents=True, exist_ok=True)
 
             try:
-                if not folder_path.exists():
+                if not source_path.exists():
                     continue
-                shutil.move(str(folder_path), str(target_path))
-                os.symlink(str(target_path), str(folder_path), target_is_directory=True)
-                log_lines.append(f"{folder_path} --> {target_path}")
+                shutil.move(str(source_path), str(target_path))
+                os.symlink(str(target_path), str(source_path), target_is_directory=source_path.is_dir())
+                log_lines.append(f"{source_path} --> {target_path}")
                 total_moved += 1
                 total_size += size
                 self.progress.setValue(int((idx + 1) / len(selected_rows) * 100))
             except Exception as e:
-                QMessageBox.warning(self, "Error", f"Failed to move {folder_path}:\n{str(e)}")
+                QMessageBox.warning(self, "Error", f"Failed to move {source_path}:\n{str(e)}")
 
         with open(symlink_log, "a") as f:
             f.write("\n".join(log_lines) + "\n")
 
-        QMessageBox.information(self, "Move Complete", f"Moved {total_moved} folder(s). Total saved: {humanize.naturalsize(total_size, binary=True)}")
+        QMessageBox.information(self, "Move Complete", f"Moved {total_moved} item(s). Total saved: {humanize.naturalsize(total_size, binary=True)}")
         self.start_scan()
 
     def undo_symlinks(self):
@@ -254,7 +272,7 @@ class ProfileSlimmer(QWidget):
                 print(f"Failed to undo {orig}: {e}")
 
         symlink_log.unlink()
-        QMessageBox.information(self, "Undo Complete", f"Restored {restored} folder(s).")
+        QMessageBox.information(self, "Undo Complete", f"Restored {restored} item(s).")
         self.start_scan()
 
     def move_downloads_files(self):
