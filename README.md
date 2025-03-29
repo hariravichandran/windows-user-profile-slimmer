@@ -49,3 +49,14 @@ Copy
 Edit
 python profile_slimmer_full.py
 
+
+
+````
+
+
+conda create -n windows-profile-slimmer python=3.12
+
+`conda activate windows-profile-slimmer`
+
+pip install pyqt5 humanize
+
