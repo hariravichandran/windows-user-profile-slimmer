@@ -30,23 +30,24 @@ The program creates a symbolic link in your user profile and moves the files to 
 
 ---
 
-## How to Check Your Profile Size in Windows 11
+## How to Check Your User Profile Size in Windows 11
 
 1. Press `Win + R`, type:  `%userprofile%`
 2. Select all folders (Ctrl+A), right-click → Properties
 3. AppData is hidden by default and should be excluded manually
 4. This tool automatically excludes `AppData` for you
 5. Essentially, your user profile is the size of your `C:\Users\<Username>\` directory minus the size of your `C:\Users\<Username>\AppData` folder.
+6. If your user profile size is greater than say, 20 GB, it can cause performance issues for your machine, especially on older machines and machines with limited storage.
+7. A good, free program that allows you to get a relatively precise file/folder breakdown for your machine is WinDirStat (https://windirstat.net)
 
 ---
 
 ## Disclaimer
 
->  Use at your own risk. This tool modifies your user folder structure and creates symlinks. Make sure you:
->
-> - **Run as Administrator**
-> - **Review items carefully before moving**
-> - **Back up important data before proceeding**
+Use at your own risk. This tool modifies your user folder structure and creates symlinks. Make sure you:
+- **Run as Administrator**
+- **Review items carefully before moving**
+- **Back up important data before proceeding**
 
 This program has also only been tested on Windows 11, have not looked into older versions of Windows (10, 8.1, 8, 7, ... etc.).
 
