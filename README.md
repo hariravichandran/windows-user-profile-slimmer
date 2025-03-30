@@ -12,11 +12,30 @@ A GUI tool to reduce the size of your Windows user profile by relocating large n
 
 Large user profiles are one of the reasons that many Windows 11 computers slow down after reaching a certain age. In Windows 11, *many* programs install files directly to your `C:\Users\<Username>` directory. If you are not careful, user profiles can easily exceed 100 GB. Ideally, a small user profile of only a few gigabytes is one of the hallmarks of a fast machine.
 
+This program removes many of the manual steps (for example, figuring out which files/folders take the most space, creating brand new folders in the C:\ drive, creating the symbolic links as needed).
+
 ---
 
 ## How does it work?
 
-The program creates a symbolic link in your user profile and moves the files to a separate directory
+The program creates a symbolic link in your user profile and moves the files to a separate directory. For example, assuming your username is `Hari` and you want to move the installation of Anaconda 3 (for which each environment eats into your user profile on Windows!):
+
+1. We first move the files over from the User Profile Directory to a directory that we create on the C:\ drive (So `C:\User_<Username>`):
+```
+move "C:\Users\Hari\anaconda3" "C:\User_Hari\anaconda3"
+```
+
+2. Remove the read-only permissions that are automatically added on the directory:
+```
+attrib -r "C:\User_Hari\anaconda3" /S /D
+```
+
+3. Create a symbolic link that links the original user folder location in the User Profile to the new folder that we moved the files to:
+```
+mklink /D "C:\Users\Hari\anaconda3" "C:\User_Hari\anaconda3"
+```
+
+The advantage of the symbolic link approach is that it allows us to continue to use the default directories on the user profile while also allowing us to not deal with programs constantly adding more data to the user profile and it growing out of control. As another real-world example, suppose you want to install LM Studio and run some different LLM models locally. By default, every model you download locally is added to your user profile. Before you know it, you've added 30+ GB to your user profile after downloading a few models, significantly slowing down your machine.
 
 ---
 
@@ -37,7 +56,7 @@ The program creates a symbolic link in your user profile and moves the files to 
 3. AppData is hidden by default and should be excluded manually
 4. This tool automatically excludes `AppData` for you
 5. Essentially, your user profile is the size of your `C:\Users\<Username>\` directory minus the size of your `C:\Users\<Username>\AppData` folder.
-6. If your user profile size is greater than say, 20 GB, it can cause performance issues for your machine, especially on older machines and machines with limited storage.
+6. If your user profile size is greater than say, 20 GB, it can cause performance issues for your machine, especially on older machines and machines with limited storage. Ideally, we'd like it to be as small as possible and only contain the bare essential files for the best performance, so say < 5 GB.
 7. A good, free program that allows you to get a relatively precise file/folder breakdown for your machine is WinDirStat (https://windirstat.net). You can use it to get a more precise view of how large the user profile is.
 
 ---
