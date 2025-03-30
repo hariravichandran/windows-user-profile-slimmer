@@ -38,7 +38,7 @@ The program creates a symbolic link in your user profile and moves the files to 
 4. This tool automatically excludes `AppData` for you
 5. Essentially, your user profile is the size of your `C:\Users\<Username>\` directory minus the size of your `C:\Users\<Username>\AppData` folder.
 6. If your user profile size is greater than say, 20 GB, it can cause performance issues for your machine, especially on older machines and machines with limited storage.
-7. A good, free program that allows you to get a relatively precise file/folder breakdown for your machine is WinDirStat (https://windirstat.net)
+7. A good, free program that allows you to get a relatively precise file/folder breakdown for your machine is WinDirStat (https://windirstat.net). You can use it to get a more precise view of how large the user profile is.
 
 ---
 
