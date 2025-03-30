@@ -70,12 +70,12 @@ python profile_slimmer.py
 2. Select your user profile folder (C:\Users\YourName)
 3. Wait for the scan to complete
 4. Check off large folders/files you want to move
-5. Click Move Selected and Create Symlinks
+5. Click Move Selected and Create Symlinks (symlinks are stored in symlinks.txt)
 6. (Optional) Use Undo to restore everything
 
 ### Safe by Design
 - AppData, .git, .idea, .vscode, and system folders are auto-excluded
-- Symlinks are logged in symlinks.txt in your user profile directory
+- Symlinks are logged in symlinks.txt in your user profile directory (`C:\Users\<Username>`)
 
 ## Project Structure
 ```
