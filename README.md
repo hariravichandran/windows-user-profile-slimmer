@@ -70,6 +70,8 @@ Use at your own risk. This tool modifies your user folder structure and creates 
 
 This program has also only been tested on Windows 11, have not looked into older versions of Windows (10, 8.1, 8, 7, ... etc.).
 
+It's possible (but not likely!) that a Windows Update might adjust/remove the symbolic links. In that case, remember that `symlinks.txt` is stored in your User Profile Directory and has the list of all the symlinks that have been made.
+
 ---
 
 ## Environment Creation Using Anaconda 3
@@ -104,3 +106,25 @@ windows-user-profile-slimmer/
 ├── README.md                ← This documentation
 └── .gitignore               ← Excludes .idea/, .vscode/, etc.
 ```
+
+### Contributing
+We welcome contributions of all kinds! Whether you're fixing a bug, improving the UI, suggesting a new feature, or just reporting a problem — you're helping make this tool better for everyone.
+
+#### Ways You Can Help
+- Report issues — Found a bug or unexpected behavior? Open an issue
+- Suggest a feature — Is there something you'd like the tool to do? Let us know!
+- Submit a pull request — Add enhancements, refactor code, or improve documentation
+- Improve documentation — Even fixing typos or adding usage examples helps
+
+#### Guidelines
+- Please keep your contributions focused and scoped to one feature or fix per pull request
+- Include a clear explanation of what was changed and why
+- Be respectful and constructive — we're here to collaborate
+
+#### Contact
+Have questions, feedback, or want to share your use case? Feel free to:
+- Start a discussion in Issues
+- Tag your fork on GitHub — we'd love to see how you use the tool!
+
+#### Star the Project
+If you find this tool useful, consider starring the repo — it helps more people discover it!
