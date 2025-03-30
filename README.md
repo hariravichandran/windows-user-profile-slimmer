@@ -18,7 +18,7 @@ This program removes many of the manual steps (for example, figuring out which f
 
 ## How does it work?
 
-The program creates a symbolic link in your user profile and moves the files to a separate directory. For example, assuming your username is `Hari` and you want to move the installation of Anaconda 3 (for which each environment eats into your user profile on Windows!):
+The program creates a symbolic link in your user profile and moves the files to a separate directory. For example, assuming your username is `Hari` and you want to move the installation of Anaconda 3 (for which each new environment eats into your user profile on Windows!):
 
 1. We first move the files over from the User Profile Directory to a directory that we create on the C:\ drive (So `C:\User_<Username>`):
 ```
