@@ -10,7 +10,7 @@ A GUI tool to reduce the size of your Windows user profile by relocating large n
 - **Compatibility:** Prevents profile size limits in managed environments (e.g. Active Directory, Remote Desktop).
 - **Storage Management:** Helps manage large folders like `Documents`, `Downloads`, `GitHub`, and large files (> 500 MB).
 
-Large user profiles are one of the reasons that many Windows 11 computers slow down after reaching a certain age. In Windows 11, *many* programs install files directly to your `C:\Users\<Username>` directory. If you are not careful, user profiles can easily exceed 100 GB. Ideally, a small user profile of only a few gigabytes is one of the hallmarks of a fast machine.
+Large user profiles are one of the reasons that many Windows 11 computers slow down after reaching a certain age. In Windows 11, *many* programs install files directly to your `C:\Users\<Username>` directory. If you are not careful, user profiles can easily exceed 100 GB. Ideally, a small user profile of only a few gigabytes is one of the hallmarks of a fast Windows machine.
 
 This program removes many of the manual steps (for example, figuring out which files/folders take the most space, creating brand new folders in the C:\ drive, creating the symbolic links as needed).
 
